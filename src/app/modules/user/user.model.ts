@@ -42,7 +42,7 @@ const UserSchema = new Schema<TUser, UserModel>(
     image: imageSchema,
     fullName: {
       type: String,
-      required: true,
+      required: false,
     },
     password: {
       type: String,
@@ -143,12 +143,12 @@ UserSchema.statics.isUserExist = async function (
 };
 
 // Check if a user exists by phone number
-UserSchema.statics.isUserExistByNumber = async function (
-  countryCode: string,
-  phoneNumber: string,
-) {
-  return this.findOne({ countryCode, phoneNumber }).select('+password');
-};
+// UserSchema.statics.isUserExistByNumber = async function (
+//   countryCode: string,
+//   phoneNumber: string,
+// ) {
+//   return this.findOne({ countryCode, phoneNumber }).select('+password');
+// };
 
 // Check if a user exists by ID
 // UserSchema.statics.IsUserExistbyId = async function (
