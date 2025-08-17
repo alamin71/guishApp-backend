@@ -10,10 +10,9 @@ const createUserZodSchema = z.object({
         url: z.string().url(),
       })
       .optional(),
-    fullName: z.string().min(1),
+
     password: z.string().min(6),
-    countryCode: z.string(),
-    phoneNumber: z.string(),
+
     needsPasswordChange: z.boolean().optional(),
     passwordChangedAt: z.coerce.date().optional(),
     accountType: z
