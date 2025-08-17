@@ -4,10 +4,8 @@ import { uploadToS3 } from '../../utils/fileHelper';
 import sendResponse from '../../utils/sendResponse';
 import { userServices } from './user.service';
 import { io } from '../../../server';
-import { sendUserNotification } from '../../../socketIo';
 import AppError from '../../error/AppError';
 import httpStatus from 'http-status';
-import { saveNotification } from '../../utils/saveNotification';
 // Get current user's profile
 const getme = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.getme(req.user.id);
@@ -86,21 +84,6 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
     );
   } else {
     console.log(`❌ Room not found for userId: ${userIdToUpdate}`);
-  }
-
-  // ===== SAVE NOTIFICATION + EMIT REALTIME =====
-  try {
-    await saveNotification({
-      userId: userIdToUpdate.toString(),
-      title: 'Profile Updated',
-      userType: 'User',
-
-      message: 'Your profile has been updated successfully.',
-      type: 'profile',
-    });
-    console.log(`📤 Notification saved & emitted to room: ${userIdToUpdate}`);
-  } catch (error) {
-    console.error('❌ Error saving/emitting notification:', error);
   }
 
   // Respond with updated user info and context
