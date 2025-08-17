@@ -3,62 +3,36 @@ import catchAsync from '../../utils/catchAsync';
 import { otpServices } from './otp.service';
 import sendResponse from '../../utils/sendResponse';
 import { Request, Response } from 'express';
-import { io } from '../../../server';
+import { authService } from './otp.service';
 
-// import { sendUserNotification, sendAdminNotification } from '../../../socketIo';
+// -------------------- Signup --------------------
+const signup = catchAsync(async (req: Request, res: Response) => {
+  const { email, password, confirmPassword } = req.body;
 
-// 1. Signup initiate: send OTP & token (token is returned for OTP verification)
-const signupInitiate = catchAsync(async (req: Request, res: Response) => {
-  const result = await otpServices.initiateSignup(req.body);
+  const result = await authService.signup({
+    email,
+    password,
+    confirmPassword,
+  });
+
   sendResponse(res, {
-    statusCode: httpStatus.OK,
+    statusCode: httpStatus.CREATED,
     success: true,
-    message: 'OTP sent successfully. Please verify OTP to complete signup.',
+    message: 'Signup successfull',
     data: result,
   });
 });
 
-const signupVerifyOtp = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.token as string;
-  if (!token) {
-    throw new Error('Token required in headers');
-  }
+// -------------------- Login --------------------
+const login = catchAsync(async (req: Request, res: Response) => {
+  const { email, password } = req.body;
 
-  const { otp } = req.body;
-  const result = await otpServices.verifySignupOtp(token, otp);
-  const targetUserId = result.user._id.toString();
-
-  // 🔍 DEBUG: Check socket rooms before sending notification
-  console.log('🔍 DEBUG - Socket Rooms:');
-  console.log('  - All rooms:', Array.from(io.sockets.adapter.rooms.keys()));
-  console.log(
-    '  - Room for targetUserId exists:',
-    io.sockets.adapter.rooms.has(targetUserId),
-  );
-  console.log(
-    '  - Room for targetUserId (data):',
-    io.sockets.adapter.rooms.get(targetUserId),
-  );
+  const result = await authService.login({ email, password });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'OTP verified successfully. User created.',
-    data: result,
-  });
-});
-
-// 3. Resend signup OTP
-const resendSignupOtp = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.token as string;
-  if (!token) {
-    throw new Error('Token required in headers');
-  }
-  const result = await otpServices.resendSignupOtp(token);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'OTP resent successfully. Please verify OTP.',
+    message: 'Login successfull',
     data: result,
   });
 });
@@ -111,9 +85,11 @@ const resendForgotPasswordOtp = catchAsync(
 );
 
 export const otpControllers = {
-  signupInitiate,
-  signupVerifyOtp,
-  resendSignupOtp,
+  // signupInitiate,
+  // signupVerifyOtp,
+  signup,
+  login,
+  // resendSignupOtp,
   forgotPassword,
   verifyForgotPasswordOtp,
   resendForgotPasswordOtp,

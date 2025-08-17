@@ -31,150 +31,68 @@ const sendOtpEmail = async (email: string, otp: number, expiresAt: Date) => {
   );
 };
 
-// ---------------
-// 1. Signup: send OTP and return temp token
-const initiateSignup = async (payload: {
-  email: string;
-  fullName: string;
-  password: string;
-  phoneNumber: string;
-  countryCode?: string;
-  gender: 'Male' | 'Female';
-}) => {
-  // Check if user already exists
-  const existingUser = await User.findOne({ email: payload.email });
-  if (existingUser) {
-    throw new AppError(httpStatus.CONFLICT, 'User already exists');
-  }
+export const authService = {
+  // -------------------- Signup --------------------
+  signup: async ({
+    email,
+    password,
+    confirmPassword,
+  }: {
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
+    if (password !== confirmPassword) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Password and Confirm Password not match',
+      );
+    }
 
-  const otp = generateOtp();
-  const expiresAt = moment().add(5, 'minute').toDate();
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new AppError(httpStatus.CONFLICT, 'User already exists');
+    }
 
-  // create token payload with user data + OTP info + mode signup
-  const tokenPayload = {
-    ...payload,
-    otp,
-    expiresAt,
-    mode: 'signup',
-  };
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-  const token = jwt.sign(tokenPayload, config.jwt_access_secret as Secret, {
-    expiresIn: '5m',
-  });
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      isVerified: true,
+      role: 'user',
+    });
 
-  // send email
-  await sendOtpEmail(payload.email, otp, expiresAt);
-
-  // return { token };
-  return {
-    token,
-    ...(process.env.NODE_ENV !== 'production' && { otp }), // only show OTP in dev
-  };
-};
-
-// 2. Signup: verify OTP & create user
-const verifySignupOtp = async (token: string, otp: string | number) => {
-  if (!token) {
-    throw new AppError(httpStatus.UNAUTHORIZED, 'Token is required');
-  }
-
-  let decoded: JwtPayloadExtended;
-  try {
-    decoded = jwt.verify(
-      token,
+    const accessToken = jwt.sign(
+      { id: user._id, role: user.role },
       config.jwt_access_secret as string,
-    ) as JwtPayloadExtended;
-  } catch {
-    throw new AppError(httpStatus.FORBIDDEN, 'Token expired or invalid');
-  }
-
-  if (decoded.mode !== 'signup') {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'Invalid token for signup verification',
+      { expiresIn: '30d' },
     );
-  }
 
-  if (!decoded.otp || !decoded.expiresAt) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid token data');
-  }
+    return { user, token: accessToken };
+  },
 
-  if (new Date() > new Date(decoded.expiresAt)) {
-    throw new AppError(httpStatus.FORBIDDEN, 'OTP expired');
-  }
+  // -------------------- Login --------------------
+  login: async ({ email, password }: { email: string; password: string }) => {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
+    }
 
-  if (Number(otp) !== Number(decoded.otp)) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'OTP did not match');
-  }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
+    }
 
-  // Create user now
-  // const hashedPassword = await bcrypt.hash(decoded.password!, 12);
-  const newUser = await User.create({
-    email: decoded.email,
-    fullName: decoded.fullName,
-    password: decoded.password, // raw password, let pre-save hook hash it
-    phoneNumber: decoded.phoneNumber,
-    countryCode: decoded.countryCode,
-    gender: decoded.gender,
-    isVerified: true,
-    role: 'user',
-  });
-
-  // Generate access token for login
-  const accessToken = jwt.sign(
-    { id: newUser._id, role: newUser.role },
-    config.jwt_access_secret as Secret,
-    { expiresIn: '30d' },
-  );
-
-  return { user: newUser, token: accessToken };
-};
-
-const resendSignupOtp = async (token: string) => {
-  if (!token) {
-    throw new AppError(httpStatus.UNAUTHORIZED, 'Token is required');
-  }
-  let decoded: JwtPayloadExtended;
-  try {
-    decoded = jwt.verify(
-      token,
+    const accessToken = jwt.sign(
+      { id: user._id, role: user.role },
       config.jwt_access_secret as string,
-    ) as JwtPayloadExtended;
-  } catch {
-    throw new AppError(httpStatus.FORBIDDEN, 'Token expired or invalid');
-  }
+      { expiresIn: '30d' },
+    );
 
-  if (decoded.mode !== 'signup' || !decoded.email) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid token for resend OTP');
-  }
-
-  const otp = generateOtp();
-  const expiresAt = moment().add(5, 'minute').toDate();
-
-  const { exp, iat, ...safeDecoded } = decoded;
-
-  const newTokenPayload = {
-    ...safeDecoded,
-    otp,
-    expiresAt,
-  };
-
-  const newToken = jwt.sign(
-    newTokenPayload,
-    config.jwt_access_secret as Secret,
-    {
-      expiresIn: '10m',
-    },
-  );
-
-  await sendOtpEmail(decoded.email, otp, expiresAt);
-
-  return {
-    token: newToken,
-    ...(process.env.NODE_ENV !== 'production' && { otp }),
-  };
+    return { user, token: accessToken };
+  },
 };
-
 // 4. Forgot password - send OTP and token
 const initiateForgotPassword = async (email: string) => {
   const user = await User.findOne({ email });
@@ -324,9 +242,6 @@ const resendForgotPasswordOtp = async (token: string) => {
 };
 
 export const otpServices = {
-  initiateSignup,
-  verifySignupOtp,
-  resendSignupOtp,
   initiateForgotPassword,
   verifyForgotPasswordOtp,
   resendForgotPasswordOtp,

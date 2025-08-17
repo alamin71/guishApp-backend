@@ -50,18 +50,7 @@ const UserSchema = new Schema<TUser, UserModel>(
       default: '',
       select: false,
     },
-    countryCode: {
-      type: String,
-      required: true,
-      default: '',
-    },
 
-    phoneNumber: {
-      type: String,
-      required: true,
-      unique: true,
-      default: '',
-    },
     needsPasswordChange: {
       type: Boolean,
       default: false,
@@ -85,11 +74,7 @@ const UserSchema = new Schema<TUser, UserModel>(
       required: true,
       default: UserRole.customer, // ✅ Fix: Add default
     },
-    gender: {
-      type: String,
-      enum: ['Male', 'Female'],
-      required: true,
-    },
+
     subscription: {
       plan: {
         type: Schema.Types.ObjectId,

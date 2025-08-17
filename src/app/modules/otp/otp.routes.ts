@@ -1,11 +1,3 @@
-// import { Router } from 'express';
-// import { otpControllers } from './otp.controller';
-// const router = Router();
-
-// router.post('/verify-otp', otpControllers.verifyOtp);
-// router.post('/resend-otp', otpControllers.resendOtp);
-
-// export const otpRoutes = router;
 import { Router } from 'express';
 import { otpControllers } from './otp.controller';
 import validateRequest from '../../middleware/validateRequest';
@@ -15,18 +7,15 @@ const router = Router();
 
 // User Signup OTP
 router.post(
-  '/signup-initiate',
+  '/signup',
   validateRequest(otpValidation.signupInitiateSchema),
-  otpControllers.signupInitiate,
+  otpControllers.signup,
 );
-
 router.post(
-  '/signup-verify',
-  validateRequest(otpValidation.verifyOtpSchema),
-  otpControllers.signupVerifyOtp,
+  '/login',
+  validateRequest(otpValidation.signupInitiateSchema),
+  otpControllers.login,
 );
-
-router.post('/signup-resend', otpControllers.resendSignupOtp);
 
 //  Forgot Password OTP
 router.post(
@@ -41,7 +30,6 @@ router.post(
   otpControllers.verifyForgotPasswordOtp,
 );
 
-router.post('/signup/resend', otpControllers.resendSignupOtp);
 router.post('/forgot/resend', otpControllers.resendForgotPasswordOtp);
 
 export const otpRoutes = router;
