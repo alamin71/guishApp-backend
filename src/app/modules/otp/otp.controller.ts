@@ -23,20 +23,6 @@ const signup = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// -------------------- Login --------------------
-const login = catchAsync(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  const result = await authService.login({ email, password });
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Login successfull',
-    data: result,
-  });
-});
-
 // 4. Forgot password: send OTP + reset token
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -85,11 +71,7 @@ const resendForgotPasswordOtp = catchAsync(
 );
 
 export const otpControllers = {
-  // signupInitiate,
-  // signupVerifyOtp,
   signup,
-  login,
-  // resendSignupOtp,
   forgotPassword,
   verifyForgotPasswordOtp,
   resendForgotPasswordOtp,

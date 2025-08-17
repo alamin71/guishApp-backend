@@ -12,36 +12,37 @@ import axios from 'axios';
 
 const googleClient = new OAuth2Client('YOUR_GOOGLE_CLIENT_ID'); // Replace with your Google Client ID
 
+// -------------------- Login --------------------
 const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email }).select('+password');
 
-  if (!user || !user?.password) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  // Find user and include password
+  const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
   }
 
+  // Compare password
   const isPasswordMatched = await bcrypt.compare(password, user.password);
   if (!isPasswordMatched) {
-    throw new AppError(httpStatus.UNAUTHORIZED, 'Incorrect password');
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
   }
 
+  // Generate JWT tokens
   const accessToken = jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-    },
+    { id: user._id, role: user.role },
     config.jwt_access_secret as Secret,
     { expiresIn: config.jwt_access_expires_in },
   );
 
   const refreshToken = jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-    },
+    { id: user._id, role: user.role },
     config.jwt_refresh_secret as Secret,
     { expiresIn: config.jwt_refresh_expires_in },
   );
+
+  // Hide password before sending response
+  user.password = '';
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

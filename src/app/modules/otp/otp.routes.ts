@@ -11,11 +11,6 @@ router.post(
   validateRequest(otpValidation.signupInitiateSchema),
   otpControllers.signup,
 );
-router.post(
-  '/login',
-  validateRequest(otpValidation.signupInitiateSchema),
-  otpControllers.login,
-);
 
 //  Forgot Password OTP
 router.post(
