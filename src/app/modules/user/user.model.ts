@@ -75,19 +75,19 @@ const UserSchema = new Schema<TUser, UserModel>(
       default: UserRole.customer, // ✅ Fix: Add default
     },
 
-    subscription: {
-      plan: {
-        type: Schema.Types.ObjectId,
-        ref: 'Subscription',
-      },
-      startsAt: Date,
-      expiresAt: Date,
-      status: {
-        type: String,
-        enum: ['active', 'expired', 'cancelled'],
-        default: 'active',
-      },
-    },
+    // subscription: {
+    //   plan: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'Subscription',
+    //   },
+    //   startsAt: Date,
+    //   expiresAt: Date,
+    //   status: {
+    //     type: String,
+    //     enum: ['active', 'expired', 'cancelled'],
+    //     default: 'active',
+    //   },
+    // },
 
     isActive: {
       type: Boolean,

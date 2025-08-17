@@ -81,7 +81,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const user = await User.findById(decoded.id);
   if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
 
-  user.password = newPassword; // raw password
+  user.password = newPassword; // pre-save hook auto hash করবে
   await user.save();
 
   sendResponse(res, {
@@ -107,7 +107,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   // const hashedPassword = await bcrypt.hash(newPassword, 12);
   // user.password = hashedPassword;
   // await user.save();
-  user.password = newPassword; // raw password
+  user.password = newPassword; // pre-save hook auto hash করবে
   await user.save();
 
   sendResponse(res, {
