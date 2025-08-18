@@ -13,46 +13,80 @@ import { TchangePassword, Tlogin, TresetPassword } from './auth.interface';
 import { createToken, verifyToken } from './auth.utils';
 import { string } from 'zod';
 
+// const login = async (payload: Tlogin) => {
+//   const user = await User.isUserExist(payload?.email as string);
+//   if (!user)
+//     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
+
+//   if (!user?.isActive)
+//     throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
+//   if (user?.isDeleted)
+//     throw new AppError(httpStatus.FORBIDDEN, 'User is deleted');
+//   if (!user?.isVerified)
+//     throw new AppError(httpStatus.BAD_REQUEST, 'User is not verified');
+
+//   const isMatch = await User.isPasswordMatched(
+//     payload.password,
+//     user.password!,
+//   );
+//   if (!isMatch)
+//     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
+
+//   const accessToken = createToken(
+//     { userId: user._id.toString(), role: user.role },
+//     config.jwt_access_secret as string,
+//     config.jwt_access_expires_in as string,
+//   );
+//   const refreshToken = createToken(
+//     { userId: user._id.toString(), role: user.role },
+//     config.jwt_refresh_secret as string,
+//     config.jwt_refresh_expires_in as string,
+//   );
+
+//   user.password = '';
+//   return { user, accessToken, refreshToken };
+// };
+
+//change password
 const login = async (payload: Tlogin) => {
-  const user = await User.isUserExist(payload?.email as string);
+  // 1. Check if user exists & get hashed password
+  const user = await User.isUserExist(payload.email as string);
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
-  }
-  if (!user?.isActive) {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
-  }
-  if (user?.isDeleted) {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
-  }
-  if (!user?.isVerified) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'user is not verified !');
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
   }
 
-  if (!(await User.isPasswordMatched(payload.password, user.password))) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'password do not match');
+  // 2. Check if user is active, verified, not deleted
+  if (!user.isActive)
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
+  if (user.isDeleted)
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted');
+  if (!user.isVerified)
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is not verified');
+
+  // 3. Compare password
+  const isMatch = await bcrypt.compare(payload.password, user.password!);
+  if (!isMatch) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
   }
 
-  const jwtPayload = {
-    userId: user?._id.toString(),
-    role: user?.role,
-  };
+  // 4. Create tokens
   const accessToken = createToken(
-    jwtPayload,
+    { userId: user._id.toString(), role: user.role },
     config.jwt_access_secret as string,
     config.jwt_access_expires_in as string,
   );
 
   const refreshToken = createToken(
-    jwtPayload,
+    { userId: user._id.toString(), role: user.role },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string,
   );
-  return {
-    accessToken,
-    refreshToken,
-  };
+
+  // 5. Hide password before returning
+  user.password = '';
+
+  return { user, accessToken, refreshToken };
 };
-//change password
 const changePassword = async (id: string, payload: TchangePassword) => {
   const user = await User.IsUserExistbyId(id);
   if (!user) {

@@ -71,27 +71,6 @@ export const authService = {
 
     return { user, token: accessToken };
   },
-
-  // -------------------- Login --------------------
-  login: async ({ email, password }: { email: string; password: string }) => {
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
-    }
-
-    const accessToken = jwt.sign(
-      { id: user._id, role: user.role },
-      config.jwt_access_secret as string,
-      { expiresIn: '30d' },
-    );
-
-    return { user, token: accessToken };
-  },
 };
 // 4. Forgot password - send OTP and token
 const initiateForgotPassword = async (email: string) => {
