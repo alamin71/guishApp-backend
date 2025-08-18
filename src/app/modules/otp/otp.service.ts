@@ -54,11 +54,9 @@ export const authService = {
       throw new AppError(httpStatus.CONFLICT, 'User already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-
     const user = await User.create({
       email,
-      password: hashedPassword,
+      password,
       isVerified: true,
       role: 'user',
     });
