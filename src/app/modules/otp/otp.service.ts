@@ -215,7 +215,10 @@ const resendForgotPasswordOtp = async (token: string) => {
 
   await sendOtpEmail(user.email, otp, expiresAt);
 
-  return { token: newToken };
+  return {
+    token: newToken,
+    ...(process.env.NODE_ENV !== 'production' && { otp }),
+  };
 };
 
 export const otpServices = {
