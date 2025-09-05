@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 // ✅ Create Category (max 3 images)
-router.post('/', upload.array('images', 3), createCategory);
+router.post('/createCategory', upload.array('images', 3), createCategory);
 
 // ✅ Get All Categories
 router.get('/', getAllCategories);
