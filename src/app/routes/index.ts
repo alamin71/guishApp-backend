@@ -4,6 +4,7 @@ import { otpRoutes } from '../modules/otp/otp.routes';
 import { userRoutes } from '../modules/user/user.route';
 import { adminRoutes } from '../modules/Dashboard/admin/admin.route';
 import { ruleRoutes } from '../modules/Dashboard/Rules/rule.route';
+import { CategoryRoutes } from '../modules/categoryList/category.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -31,7 +32,7 @@ const moduleRoutes = [
   },
   {
     path: '/categories',
-    route: otpRoutes,
+    route: CategoryRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
