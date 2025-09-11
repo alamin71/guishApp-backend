@@ -20,7 +20,7 @@ router.patch(
 // new route for personal info update
 router.put(
   '/update-personal-info',
-  auth(),
+  auth(USER_ROLE.user),
   userControllers.updatePersonalInfo,
 );
 //toatal user count

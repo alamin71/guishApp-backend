@@ -80,7 +80,7 @@ const UserSchema = new Schema<TUser, UserModel>(
       type: String,
       enum: Object.values(UserRole),
       required: true,
-      default: UserRole.customer,
+      default: UserRole.user,
     },
 
     isActive: {
@@ -101,7 +101,7 @@ const UserSchema = new Schema<TUser, UserModel>(
     },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true, 
   },
 );
 
