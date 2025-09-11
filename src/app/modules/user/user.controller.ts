@@ -101,6 +101,17 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
     },
   });
 });
+// Update personal information
+const updatePersonalInfo = catchAsync(async (req: Request, res: Response) => {
+  const result = await userServices.updatePersonalInfo(req.user.id, req.body);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Personal information updated successfully',
+    data: result,
+  });
+});
 
 // Get single user (used by admin)
 const getsingleUser = catchAsync(async (req: Request, res: Response) => {
@@ -198,6 +209,7 @@ const unblockUser = catchAsync(async (req: Request, res: Response) => {
 export const userControllers = {
   getme,
   updateProfile,
+  updatePersonalInfo,
   getsingleUser,
   getAllUsers,
   deleteAccount,

@@ -3,6 +3,8 @@ import httpStatus from 'http-status';
 import AppError from '../../error/AppError';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { TUser } from './user.interface';
+import { IProfileData } from './user.interface';
+
 import User from './user.model';
 import { subMonths, startOfMonth } from 'date-fns';
 
@@ -46,6 +48,23 @@ const updateProfile = async (id: string, payload: Partial<TUser>) => {
   });
 
   return updatedUser;
+};
+
+// Update only personal info
+const updatePersonalInfo = async (id: string, payload: IProfileData) => {
+  const user = await User.findById(id);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  // Merge old + new profileData
+  user.profileData = {
+    ...user.profileData,
+    ...payload,
+  };
+
+  await user.save();
+  return user;
 };
 
 const getAllUsers = async (query: Record<string, any>) => {
@@ -246,6 +265,7 @@ const unblockUser = async (id: string) => {
 export const userServices = {
   getme,
   updateProfile,
+  updatePersonalInfo,
   getSingleUser,
   deleteAccount,
   updatePhoneNumber,
