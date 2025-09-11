@@ -25,6 +25,16 @@ interface image {
   id: string | number;
   url: string;
 }
+export interface IProfileData {
+  height?: string;
+  shirtSize?: string;
+  tShirtSize?: string;
+  neckSize?: string;
+  sleeveLength?: string;
+  bottomSize?: string;
+  formalShoeSize?: string;
+  sportsShoeSize?: string;
+}
 export interface TUser {
   [x: string]: any;
   id?: string;
@@ -45,6 +55,7 @@ export interface TUser {
   accountType?: 'custom' | 'google';
   countryCode: string;
   fcmToken?: string;
+  profileData?: IProfileData;
 }
 
 export interface UserModel extends Model<TUser> {

@@ -8,7 +8,7 @@ import { Types } from 'mongoose';
 // Define the schema for Verification
 const VerificationSchema = new Schema({
   otp: {
-    type: Number, // Allows string or number
+    type: Number,
     required: true,
   },
   expiresAt: {
@@ -23,7 +23,7 @@ const VerificationSchema = new Schema({
 });
 const imageSchema = new Schema({
   id: {
-    type: String, // Allows string or number
+    type: String,
     required: true,
   },
   url: {
@@ -31,6 +31,17 @@ const imageSchema = new Schema({
     required: true,
   },
 });
+const profileSchema = new Schema({
+  height: String,
+  shirtSize: String,
+  tShirtSize: String,
+  neckSize: String,
+  sleeveLength: String,
+  bottomSize: String,
+  formalShoeSize: String,
+  sportsShoeSize: String,
+});
+
 // Define the schema for the User model
 const UserSchema = new Schema<TUser, UserModel>(
   {
@@ -63,31 +74,14 @@ const UserSchema = new Schema<TUser, UserModel>(
       enum: ['custom', 'google', 'facebook'],
       default: 'custom',
     },
-    // role: {
-    //   type: String,
-    //   enum: Object.values(UserRole),
-    //   required: true,
-    // },
+    profileData: { type: profileSchema, default: {} },
+
     role: {
       type: String,
       enum: Object.values(UserRole),
       required: true,
-      default: UserRole.customer, // ✅ Fix: Add default
+      default: UserRole.customer,
     },
-
-    // subscription: {
-    //   plan: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'Subscription',
-    //   },
-    //   startsAt: Date,
-    //   expiresAt: Date,
-    //   status: {
-    //     type: String,
-    //     enum: ['active', 'expired', 'cancelled'],
-    //     default: 'active',
-    //   },
-    // },
 
     isActive: {
       type: Boolean,
@@ -111,15 +105,6 @@ const UserSchema = new Schema<TUser, UserModel>(
   },
 );
 
-// Pre-save hook to hash password if it is modified or new
-// UserSchema.pre('save', async function (next) {
-//   const user = this;
-//   user.password = await bcrypt.hash(
-//     user.password as string,
-//     Number(config.bcrypt_salt_rounds),
-//   );
-//   next();
-// });
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(
@@ -141,27 +126,6 @@ UserSchema.statics.isUserExist = async function (
 ): Promise<TUser | null> {
   return this.findOne({ email }).select('+password');
 };
-
-// Check if a user exists by phone number
-// UserSchema.statics.isUserExistByNumber = async function (
-//   countryCode: string,
-//   phoneNumber: string,
-// ) {
-//   return this.findOne({ countryCode, phoneNumber }).select('+password');
-// };
-
-// Check if a user exists by ID
-// UserSchema.statics.IsUserExistbyId = async function (
-//   id: string,
-// ): Promise<TUser | null> {
-//   return this.findById(id);
-// };
-
-// UserSchema.statics.IsUserExistbyId = async function (
-//   id: string,
-// ): Promise<Pick<TUser, '_id' | 'email' | 'role' | 'password'> | null> {
-//   return this.findById(id).select('+password');
-// };
 
 UserSchema.statics.IsUserExistbyId = async function (
   id: string,
