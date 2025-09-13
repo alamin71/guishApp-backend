@@ -63,7 +63,7 @@ const UserSchema = new Schema<TUser, UserModel>(
     },
 
     needsPasswordChange: {
-      type: Boolean,
+      type: Boolean, 
       default: false,
     },
     passwordChangedAt: {
