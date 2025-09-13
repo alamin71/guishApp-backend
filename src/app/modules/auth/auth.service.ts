@@ -13,41 +13,6 @@ import { TchangePassword, Tlogin, TresetPassword } from './auth.interface';
 import { createToken, verifyToken } from './auth.utils';
 import { string } from 'zod';
 
-// const login = async (payload: Tlogin) => {
-//   const user = await User.isUserExist(payload?.email as string);
-//   if (!user)
-//     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
-
-//   if (!user?.isActive)
-//     throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
-//   if (user?.isDeleted)
-//     throw new AppError(httpStatus.FORBIDDEN, 'User is deleted');
-//   if (!user?.isVerified)
-//     throw new AppError(httpStatus.BAD_REQUEST, 'User is not verified');
-
-//   const isMatch = await User.isPasswordMatched(
-//     payload.password,
-//     user.password!,
-//   );
-//   if (!isMatch)
-//     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid email or password');
-
-//   const accessToken = createToken(
-//     { userId: user._id.toString(), role: user.role },
-//     config.jwt_access_secret as string,
-//     config.jwt_access_expires_in as string,
-//   );
-//   const refreshToken = createToken(
-//     { userId: user._id.toString(), role: user.role },
-//     config.jwt_refresh_secret as string,
-//     config.jwt_refresh_expires_in as string,
-//   );
-
-//   user.password = '';
-//   return { user, accessToken, refreshToken };
-// };
-
-//change password
 const login = async (payload: Tlogin) => {
   // 1. Check if user exists & get hashed password
   const user = await User.isUserExist(payload.email as string);
@@ -71,13 +36,13 @@ const login = async (payload: Tlogin) => {
 
   // 4. Create tokens
   const accessToken = createToken(
-    { userId: user._id.toString(), role: user.role },
+    { id: user._id.toString(), userId: user._id.toString(), role: user.role },
     config.jwt_access_secret as string,
     config.jwt_access_expires_in as string,
   );
 
   const refreshToken = createToken(
-    { userId: user._id.toString(), role: user.role },
+    { id: user._id.toString(), userId: user._id.toString(), role: user.role },
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string,
   );
@@ -250,6 +215,7 @@ const refreshToken = async (token: string) => {
   }
 
   const jwtPayload = {
+    id: user.id!,
     userId: user.id!,
     role: user.role!,
   };
