@@ -5,7 +5,7 @@ import { IContact } from './contact.interface';
 const ContactSchema = new Schema<IContact>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
-    name: { type: String, required: true },
+    name: { type: String },
     phone: { type: String },
     email: { type: String },
     isAppUser: { type: Boolean, default: false },
