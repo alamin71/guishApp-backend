@@ -140,29 +140,10 @@ const getAllContacts = catchAsync(async (req: Request, res: Response) => {
     data: contacts,
   });
 });
-const getProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id;
 
-  const user = await User.findById(userId).select('fullName email phone role categories');
-  if (!user) {
-    return sendResponse(res, {
-      statusCode: httpStatus.NOT_FOUND,
-      success: false,
-      message: 'User not found',
-      data: null,
-    });
-  }
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'User profile fetched successfully',
-    data: user,
-  });
-});
 
 export const contactController = {
     importContacts, 
     getAllContacts,
-    getProfile 
+ 
 };
