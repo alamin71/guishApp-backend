@@ -77,6 +77,8 @@ router.get(
   auth(USER_ROLE.vendor, USER_ROLE.admin),
   userControllers.getsingleUser,
 );
+
+router.get('/profile/:id', auth(), userControllers.getProfile);
 router.get(
   '/',
   auth(USER_ROLE.vendor, USER_ROLE.admin),

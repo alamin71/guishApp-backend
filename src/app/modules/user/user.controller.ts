@@ -6,6 +6,7 @@ import { userServices } from './user.service';
 import { io } from '../../../server';
 import AppError from '../../error/AppError';
 import httpStatus from 'http-status';
+import User from './user.model'; // <-- Add this import for the User model
 // Get current user's profile
 const getme = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.getme(req.user.id);
@@ -123,6 +124,31 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+//Get user profile by id
+const getProfile = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+
+  const user = await User.findById(userId)
+    .select('-password -__v -isDeleted -needsPasswordChange') // exclude sensitive/internal fields
+    .lean();
+
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: 'User not found',
+      data: null,
+    });
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'User profile fetched successfully',
+    data: user,
+  });
+});
+
 
 // Get all users (used by admin)
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
@@ -209,6 +235,7 @@ const unblockUser = catchAsync(async (req: Request, res: Response) => {
 export const userControllers = {
   getme,
   updateProfile,
+  getProfile,
   updatePersonalInfo,
   getsingleUser,
   getAllUsers,
