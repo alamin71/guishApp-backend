@@ -1,4 +1,4 @@
-import { Document, Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
 
 export interface ICategoryImage {
   id: string;
@@ -8,6 +8,7 @@ export interface ICategoryImage {
 export interface ICategory extends Document {
   categoryName: string;
   categoryImages: ICategoryImage[];
+  createdBy: Types.ObjectId;
 }
 
 export type CategoryModel = Model<ICategory>;

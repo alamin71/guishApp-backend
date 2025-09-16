@@ -5,7 +5,7 @@ import { CategoryService } from './category.service';
 import { StatusCodes } from 'http-status-codes';
 import { uploadFileToS3 } from '../../utils/uploadFileToS3';
 
-// ✅ Create/Save Category
+//  Create/Save Category
 export const createCategory = catchAsync(
   async (req: Request, res: Response) => {
     const { categoryName } = req.body;
@@ -21,6 +21,7 @@ export const createCategory = catchAsync(
     const result = await CategoryService.createCategory({
       categoryName,
       categoryImages: uploadedObjects,
+      createdBy: req.user.id,
     });
 
     sendResponse(res, {
@@ -32,7 +33,7 @@ export const createCategory = catchAsync(
   },
 );
 
-// ✅ Get All Categories
+//  Get All Categories
 export const getAllCategories = catchAsync(
   async (req: Request, res: Response) => {
     const result = await CategoryService.getAllCategories();
@@ -45,7 +46,7 @@ export const getAllCategories = catchAsync(
   },
 );
 
-// ✅ Get Single Category
+//  Get Single Category
 export const getSingleCategory = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -59,7 +60,7 @@ export const getSingleCategory = catchAsync(
   },
 );
 
-// ✅ Update Category
+//  Update Category
 export const updateCategory = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -87,7 +88,7 @@ export const updateCategory = catchAsync(
   },
 );
 
-// ✅ Delete Category
+// Delete Category
 export const deleteCategory = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;

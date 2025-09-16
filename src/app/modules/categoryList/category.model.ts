@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import { ICategory, CategoryModel } from './category.interface';
 
 const categorySchema = new Schema<ICategory, CategoryModel>(
@@ -15,7 +15,13 @@ const categorySchema = new Schema<ICategory, CategoryModel>(
         url: { type: String, required: true },
       },
     ],
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',  
+      required: true,
+    },
   },
+  
   { timestamps: true },
 );
 
