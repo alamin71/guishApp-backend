@@ -7,6 +7,7 @@ import { io } from '../../../server';
 import AppError from '../../error/AppError';
 import httpStatus from 'http-status';
 import User from './user.model'; // <-- Add this import for the User model
+import Category from '../categoryList/category.model'; // import Category model
 // Get current user's profile
 const getme = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.getme(req.user.id);
@@ -148,12 +149,13 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
-//Get user profile by id
+
+//get profile information and categories names by id
 const getProfile = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id;
 
   const user = await User.findById(userId)
-    .select('-password -__v -isDeleted -needsPasswordChange') // exclude sensitive/internal fields
+    .select('-password -__v -isDeleted -needsPasswordChange')
     .lean();
 
   if (!user) {
@@ -165,11 +167,24 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
+  // If user has categories, fetch only names
+  let categoryNames: string[] = [];
+  if (user.categories && user.categories.length > 0) {
+    const categories = await Category.find({ _id: { $in: user.categories } })
+      .select('categoryName -_id')
+      .lean();
+
+    categoryNames = categories.map(cat => cat.categoryName);
+  }
+
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'User profile fetched successfully',
-    data: user,
+    data: {
+      ...user,
+      categories: categoryNames, 
+    },
   });
 });
 

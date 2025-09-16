@@ -60,7 +60,8 @@ router.get(
 );
 // Get current user's personal info
 router.get('/personal-info', 
-  auth(USER_ROLE.user),userControllers.getPersonalInfo,);
+  auth(USER_ROLE.user),userControllers.getPersonalInfo,
+);
 // Block user
 router.patch(
   '/block/:id',
