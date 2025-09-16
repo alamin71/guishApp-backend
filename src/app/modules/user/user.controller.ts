@@ -150,15 +150,54 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-//get profile information and categories names by id
-const getProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id;
+// //get profile information and categories names by id
+// const getProfile = catchAsync(async (req: Request, res: Response) => {
+//   const userId = req.params.id;
 
+//   const user = await User.findById(userId)
+//     .select('-password -__v -isDeleted -needsPasswordChange')
+//     .lean();
+
+//   if (!user) {
+//     return sendResponse(res, {
+//       statusCode: 404,
+//       success: false,
+//       message: 'User not found',
+//       data: null,
+//     });
+//   }
+
+//   // If user has categories, fetch only names
+//   let categoryNames: string[] = [];
+//   if (user.categories && user.categories.length > 0) {
+//     const categories = await Category.find({ _id: { $in: user.categories } })
+//       .select('categoryName -_id')
+//       .lean();
+
+//     categoryNames = categories.map(cat => cat.categoryName);
+//   }
+
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: 'User profile fetched successfully',
+//     data: {
+//       ...user,
+//       categories: categoryNames, 
+//     },
+//   });
+// });
+// ব্যবহারকারীর প্রোফাইল এবং তার তৈরি করা ক্যাটাগরির নামগুলো ফেরত দেয়
+const getProfile = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id; // URL থেকে user ID নেয়
+
+  // প্রথমে ব্যবহারকারীকে খুঁজে বের করি
   const user = await User.findById(userId)
-    .select('-password -__v -isDeleted -needsPasswordChange')
+    .select('-password -__v -isDeleted -needsPasswordChange') // নিরাপত্তার জন্য কিছু ফিল্ড বাদ দেই
     .lean();
 
   if (!user) {
+    // যদি ব্যবহারকারী না পাওয়া যায়
     return sendResponse(res, {
       statusCode: 404,
       success: false,
@@ -167,27 +206,24 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  // If user has categories, fetch only names
-  let categoryNames: string[] = [];
-  if (user.categories && user.categories.length > 0) {
-    const categories = await Category.find({ _id: { $in: user.categories } })
-      .select('categoryName -_id')
-      .lean();
+  // ব্যবহারকারী যদি কোনো ক্যাটাগরি তৈরি করে থাকে, তাদের নামগুলো নিয়ে আসা
+  const categories = await Category.find({ createdBy: user._id })
+    .select('categoryName -_id') // শুধু নাম আনবো, অন্য কিছু নয়
+    .lean();
 
-    categoryNames = categories.map(cat => cat.categoryName);
-  }
+  const categoryNames = categories.map(cat => cat.categoryName); // শুধু নামের অ্যারে বানানো
 
+  // Response তৈরি করি
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'User profile fetched successfully',
     data: {
       ...user,
-      categories: categoryNames, 
+      categories: categoryNames, // শুধু নাম
     },
   });
 });
-
 
 // Get all users (used by admin)
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
