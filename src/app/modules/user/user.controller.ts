@@ -187,7 +187,7 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
 //     },
 //   });
 // });
-// ব্যবহারকারীর প্রোফাইল এবং তার তৈরি করা ক্যাটাগরির নামগুলো ফেরত দেয়
+// ব্যবহারকারীর প্রোফাইল এবং তার তৈরি করা ক্যাটাগরি (নাম + ছবি) ফেরত দেয়
 const getProfile = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id; // URL থেকে user ID নেয়
 
@@ -206,12 +206,10 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  // ব্যবহারকারী যদি কোনো ক্যাটাগরি তৈরি করে থাকে, তাদের নামগুলো নিয়ে আসা
+  // ব্যবহারকারী যদি কোনো ক্যাটাগরি তৈরি করে থাকে, তাদের নাম এবং ছবি নিয়ে আসা
   const categories = await Category.find({ createdBy: user._id })
-    .select('categoryName -_id') // শুধু নাম আনবো, অন্য কিছু নয়
+    .select('categoryName categoryImages -_id') // শুধু নাম এবং ছবি আনবো
     .lean();
-
-  const categoryNames = categories.map(cat => cat.categoryName); // শুধু নামের অ্যারে বানানো
 
   // Response তৈরি করি
   sendResponse(res, {
@@ -220,7 +218,7 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     message: 'User profile fetched successfully',
     data: {
       ...user,
-      categories: categoryNames, // শুধু নাম
+      categories: categories, // নাম + ছবি
     },
   });
 });
