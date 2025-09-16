@@ -114,6 +114,30 @@ const updatePersonalInfo = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// Get personal info for current user
+const getPersonalInfo = catchAsync(async (req: Request, res: Response) => {
+  const user = await User.findById(req.user.id)
+    .select('-password -__v -isDeleted -needsPasswordChange') // exclude sensitive/internal fields
+    .lean();
+
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: 'User not found',
+      data: null,
+    });
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Personal information fetched successfully',
+    data: user,
+  });
+});
+
+
 // Get single user (used by admin)
 const getsingleUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.getSingleUser(req.params.id);
@@ -237,6 +261,7 @@ export const userControllers = {
   updateProfile,
   getProfile,
   updatePersonalInfo,
+  getPersonalInfo,
   getsingleUser,
   getAllUsers,
   deleteAccount,

@@ -58,6 +58,9 @@ router.get(
   auth(USER_ROLE.admin, USER_ROLE.user),
   userControllers.getme,
 );
+// Get current user's personal info
+router.get('/personal-info', 
+  auth(USER_ROLE.user),userControllers.getPersonalInfo,);
 // Block user
 router.patch(
   '/block/:id',
