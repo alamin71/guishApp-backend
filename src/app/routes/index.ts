@@ -6,6 +6,7 @@ import { adminRoutes } from '../modules/Dashboard/admin/admin.route';
 import { ruleRoutes } from '../modules/Dashboard/Rules/rule.route';
 import { CategoryRoutes } from '../modules/categoryList/category.route';
 import ContactsRoutes from '../modules/contacts/contact.route';
+import {SharedItemRoutes} from '../modules/SharedItem/sharedItem.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -38,6 +39,10 @@ const moduleRoutes = [
   {
     path: '/contacts',
     route: ContactsRoutes,
+  },
+  {
+    path: '/sharedItem',
+    route: SharedItemRoutes,
   },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
