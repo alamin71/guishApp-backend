@@ -96,11 +96,22 @@ export const getItemsByCategory = catchAsync(async (req: Request, res: Response)
   const { categoryId } = req.params;
   const sharedBy = req.user?.id;
 
-  const items = await SharedItem.find({ sharedBy, category: categoryId });
+  const items = await SharedItem.find({ sharedBy, category: categoryId })
+    .populate({ path: 'category', select: 'categoryName' }); // category populate
+
+  const formattedItems = items.map(item => ({
+    ...item.toObject(),
+    category: {
+      _id: (item.category as any)?._id,
+      categoryName: (item.category as any)?.categoryName
+    },
+  }));
+
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
     message: 'Category items fetched',
-    data: items,
+    data: formattedItems,
   });
 });
+
