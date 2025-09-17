@@ -19,7 +19,4 @@ const router = express.Router();
 // Import contacts
 router.post('/import', auth(), contactController.importContacts);
 
-// Get all contacts for logged-in user
-router.get('/', auth(), contactController.getAllContacts);
-
 export default router;

@@ -1,13 +1,15 @@
+
 // // src/modules/contact/contact.controller.ts
 // import { Request, Response } from 'express';
 // import catchAsync from '../../utils/catchAsync';
 // import sendResponse from '../../utils/sendResponse';
 // import User from '../user/user.model';
-// import Contact from '../contacts/contact.model';
+// import Contact from './contact.model';
 // import httpStatus from 'http-status';
 
+// // Import Contacts (আপনার আগের কোড)
 // const importContacts = catchAsync(async (req: Request, res: Response) => {
-//   const contacts = req.body.contacts; // [{name, phone?, email?}]
+//   const contacts = req.body.contacts;
 //   const ownerId = req.user?.id;
 
 //   if (!contacts || !Array.isArray(contacts)) {
@@ -48,8 +50,8 @@
 //       ownerId,
 //     };
 
-//     // Optional: save to DB
-//     // await Contact.create(newContact);
+//     // Save to DB
+//     await Contact.create(newContact);
 
 //     mappedContacts.push(newContact);
 //   }
@@ -57,12 +59,31 @@
 //   sendResponse(res, {
 //     statusCode: httpStatus.OK,
 //     success: true,
-//     message: 'Contacts processed successfully',
+//     message: 'Contacts imported successfully',
 //     data: mappedContacts,
 //   });
 // });
 
-// export const contactController = { importContacts };
+// // Get all contacts for logged-in user
+// const getAllContacts = catchAsync(async (req: Request, res: Response) => {
+//   const ownerId = req.user?.id;
+//   const contacts = await Contact.find({ ownerId }).sort({ createdAt: -1 });
+
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'Contacts fetched successfully',
+//     data: contacts,
+//   });
+// });
+
+
+// export const contactController = {
+//     importContacts, 
+//     getAllContacts,
+ 
+// };
+
 // src/modules/contact/contact.controller.ts
 import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
@@ -128,22 +149,8 @@ const importContacts = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// Get all contacts for logged-in user
-const getAllContacts = catchAsync(async (req: Request, res: Response) => {
-  const ownerId = req.user?.id;
-  const contacts = await Contact.find({ ownerId }).sort({ createdAt: -1 });
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Contacts fetched successfully',
-    data: contacts,
-  });
-});
-
-
 export const contactController = {
     importContacts, 
-    getAllContacts,
- 
 };
+
+ 

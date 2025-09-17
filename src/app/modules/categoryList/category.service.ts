@@ -35,9 +35,10 @@ const createCategory = async (payload: Partial<ICategory>) => {
   return await Category.create(payload);
 };
 
-const getAllCategories = async () => {
-  return await Category.find();
+const getAllCategories = async (userId: string) => {
+  return await Category.find({ createdBy: userId });
 };
+
 
 const getSingleCategory = async (id: string) => {
   return await Category.findById(id);

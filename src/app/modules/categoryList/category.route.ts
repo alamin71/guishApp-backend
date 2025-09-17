@@ -11,8 +11,8 @@ import {
 
 const router = express.Router();
 
-// Get All Categories (Public)
-router.get('/', getAllCategories);
+// Get All Categories (Protected - only user's categories)
+router.get('/', auth('user', 'admin'), getAllCategories);
 
 //  Get Single Category by ID (Public)
 router.get('/:id', getSingleCategory);

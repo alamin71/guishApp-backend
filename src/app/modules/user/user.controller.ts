@@ -150,54 +150,17 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// //get profile information and categories names by id
-// const getProfile = catchAsync(async (req: Request, res: Response) => {
-//   const userId = req.params.id;
 
-//   const user = await User.findById(userId)
-//     .select('-password -__v -isDeleted -needsPasswordChange')
-//     .lean();
-
-//   if (!user) {
-//     return sendResponse(res, {
-//       statusCode: 404,
-//       success: false,
-//       message: 'User not found',
-//       data: null,
-//     });
-//   }
-
-//   // If user has categories, fetch only names
-//   let categoryNames: string[] = [];
-//   if (user.categories && user.categories.length > 0) {
-//     const categories = await Category.find({ _id: { $in: user.categories } })
-//       .select('categoryName -_id')
-//       .lean();
-
-//     categoryNames = categories.map(cat => cat.categoryName);
-//   }
-
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: 'User profile fetched successfully',
-//     data: {
-//       ...user,
-//       categories: categoryNames, 
-//     },
-//   });
-// });
-// ব্যবহারকারীর প্রোফাইল এবং তার তৈরি করা ক্যাটাগরি (নাম + ছবি) ফেরত দেয়
+//get profile information and categories names by id
 const getProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id; // URL থেকে user ID নেয়
+  const userId = req.params.id; // from URL get user ID 
 
-  // প্রথমে ব্যবহারকারীকে খুঁজে বের করি
+  // find user
   const user = await User.findById(userId)
-    .select('-password -__v -isDeleted -needsPasswordChange') // নিরাপত্তার জন্য কিছু ফিল্ড বাদ দেই
+    .select('-password -__v -isDeleted -needsPasswordChange') 
     .lean();
 
   if (!user) {
-    // যদি ব্যবহারকারী না পাওয়া যায়
     return sendResponse(res, {
       statusCode: 404,
       success: false,
@@ -206,19 +169,19 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  // ব্যবহারকারী যদি কোনো ক্যাটাগরি তৈরি করে থাকে, তাদের নাম এবং ছবি নিয়ে আসা
+  // user jodi kono category create kore thake tader nam ebong chobi niye asa
   const categories = await Category.find({ createdBy: user._id })
-    .select('categoryName categoryImages -_id') // শুধু নাম এবং ছবি আনবো
+    .select('categoryName categoryImages -_id') 
     .lean();
 
-  // Response তৈরি করি
+
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'User profile fetched successfully',
     data: {
       ...user,
-      categories: categories, // নাম + ছবি
+      categories: categories, 
     },
   });
 });

@@ -153,18 +153,29 @@ export const createCategory = catchAsync(
   }
 );
 
-//  Get All Categories
+//  Get All Categories (user-specific)
 export const getAllCategories = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await CategoryService.getAllCategories();
+    const userId = req.user?.id; // middleware থেকে user আসবে
+    if (!userId) {
+      return sendResponse(res, {
+        statusCode: StatusCodes.UNAUTHORIZED,
+        success: false,
+        message: 'User not authenticated',
+        data: null,
+      });
+    }
+
+    const result = await CategoryService.getAllCategories(userId);
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
-      message: 'Categories fetched successfully',
+      message: 'User categories fetched successfully',
       data: result,
     });
   }
 );
+
 
 //  Get Single Category
 export const getSingleCategory = catchAsync(
