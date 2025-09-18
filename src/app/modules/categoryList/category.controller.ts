@@ -108,6 +108,7 @@ import sendResponse from '../../utils/sendResponse';
 import { CategoryService } from './category.service';
 import { StatusCodes } from 'http-status-codes';
 import { uploadFileToS3 } from '../../utils/uploadFileToS3';
+import Category from '../categoryList/category.model';
 
 //  Create/Save Category
 export const createCategory = catchAsync(
@@ -129,7 +130,7 @@ export const createCategory = catchAsync(
     let uploadedObjects: { id: string; url: string }[] = [];
     if (req.files && Array.isArray(req.files)) {
       const uploadPromises = req.files.map((file: Express.Multer.File) =>
-        uploadFileToS3(file, 'category/')
+        uploadFileToS3(file, 'category/'),
       );
       uploadedObjects = await Promise.all(uploadPromises);
     }
@@ -150,13 +151,35 @@ export const createCategory = catchAsync(
       message: 'Category saved successfully',
       data: populatedResult,
     });
-  }
+  },
 );
 
 //  Get All Categories (user-specific)
+// export const getAllCategories = catchAsync(
+//   async (req: Request, res: Response) => {
+//     const userId = req.user?.id; // middleware থেকে user আসবে
+//     if (!userId) {
+//       return sendResponse(res, {
+//         statusCode: StatusCodes.UNAUTHORIZED,
+//         success: false,
+//         message: 'User not authenticated',
+//         data: null,
+//       });
+//     }
+
+//     const result = await CategoryService.getAllCategories(userId);
+//     sendResponse(res, {
+//       statusCode: StatusCodes.OK,
+//       success: true,
+//       message: 'User categories fetched successfully',
+//       data: result,
+//     });
+//   }
+// );
+//  Get All Categories (user-specific)
 export const getAllCategories = catchAsync(
   async (req: Request, res: Response) => {
-    const userId = req.user?.id; // middleware থেকে user আসবে
+    const userId = req.user?.id;
     if (!userId) {
       return sendResponse(res, {
         statusCode: StatusCodes.UNAUTHORIZED,
@@ -166,16 +189,36 @@ export const getAllCategories = catchAsync(
       });
     }
 
-    const result = await CategoryService.getAllCategories(userId);
+    // সব ক্যাটাগরি বের করো
+    const categories = await CategoryService.getAllCategories(userId);
+
+    // AllShare আলাদা করে বের করো
+    const allShareCategory = await Category.findOne({
+      createdBy: userId,
+      categoryName: 'AllShare',
+    });
+
+    // যদি থাকে তাহলে merge করো
+    let finalResult = categories;
+    if (allShareCategory) {
+      // check করে যেন duplicate না হয়
+      const exists = categories.some(
+        (cat: any) =>
+          cat._id.toString() === (allShareCategory._id as any).toString(),
+      );
+      if (!exists) {
+        finalResult = [allShareCategory, ...categories];
+      }
+    }
+
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: 'User categories fetched successfully',
-      data: result,
+      data: finalResult,
     });
-  }
+  },
 );
-
 
 //  Get Single Category
 export const getSingleCategory = catchAsync(
@@ -197,7 +240,7 @@ export const getSingleCategory = catchAsync(
       message: 'Category fetched successfully',
       data: result,
     });
-  }
+  },
 );
 
 //  Update Category
@@ -219,7 +262,7 @@ export const updateCategory = catchAsync(
     let uploadedObjects: { id: string; url: string }[] = [];
     if (req.files && Array.isArray(req.files)) {
       const uploadPromises = req.files.map((file: Express.Multer.File) =>
-        uploadFileToS3(file, 'category/')
+        uploadFileToS3(file, 'category/'),
       );
       uploadedObjects = await Promise.all(uploadPromises);
     }
@@ -235,7 +278,7 @@ export const updateCategory = catchAsync(
       message: 'Category updated successfully',
       data: result,
     });
-  }
+  },
 );
 
 // Delete Category
@@ -259,5 +302,5 @@ export const deleteCategory = catchAsync(
       message: 'Category deleted successfully',
       data: null,
     });
-  }
+  },
 );
