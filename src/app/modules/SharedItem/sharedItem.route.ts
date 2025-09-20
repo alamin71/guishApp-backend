@@ -5,6 +5,7 @@ import {
   moveItemToCategory,
   getAllSharedItems,
   getItemsByCategory,
+  deleteItem,
 } from './sharedItem.controller';
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.post('/share', shareItem);            // Share item (AllShare default)
 router.patch('/move', moveItemToCategory);   // Move to another category
 router.get('/all', getAllSharedItems);       // AllShare items
 router.get('/category/:categoryId', getItemsByCategory); // Items by category
+router.delete('/:itemId', deleteItem); 
 
 export const SharedItemRoutes = router;

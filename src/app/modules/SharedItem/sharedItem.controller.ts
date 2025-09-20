@@ -270,3 +270,39 @@ export const getItemsByCategory = catchAsync(
     });
   },
 );
+// Delete item from any category
+export const deleteItem = catchAsync(async (req: Request, res: Response) => {
+  const { itemId } = req.params; // URL থেকে itemId আসবে
+  const sharedBy = req.user?.id; // লগইন করা user
+
+  if (!sharedBy) {
+    return sendResponse(res, {
+      statusCode: StatusCodes.UNAUTHORIZED,
+      success: false,
+      message: 'User not authenticated',
+      data: null,
+    });
+  }
+
+  // খুঁজো ওই user এর item
+  const item = await SharedItem.findOne({ _id: itemId, sharedBy });
+  if (!item) {
+    return sendResponse(res, {
+      statusCode: StatusCodes.NOT_FOUND,
+      success: false,
+      message: 'Item not found or not owned by user',
+      data: null,
+    });
+  }
+
+  // delete করো
+  await item.deleteOne();
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Item deleted successfully',
+    data: { id: itemId },
+  });
+});
+
