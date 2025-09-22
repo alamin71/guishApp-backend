@@ -12,10 +12,10 @@ const router = express.Router();
 
 router.use(auth('user', 'admin'));
 
-router.post('/share', shareItem);            // Share item (AllShare default)
-router.patch('/move', moveItemToCategory);   // Move to another category
-router.get('/all', getAllSharedItems);       // AllShare items
-router.get('/category/:categoryId', getItemsByCategory); // Items by category
+router.post('/share', shareItem);            
+router.patch('/move', moveItemToCategory);   
+router.get('/all', getAllSharedItems);       
+router.get('/category/:categoryId', getItemsByCategory); 
 router.delete('/:itemId', deleteItem); 
 
 export const SharedItemRoutes = router;
