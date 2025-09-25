@@ -8,6 +8,7 @@ import AppError from '../../error/AppError';
 import httpStatus from 'http-status';
 import User from './user.model'; // <-- Add this import for the User model
 import Category from '../categoryList/category.model'; // import Category model
+import SharedItem from '../SharedItem/sharedItem.model'; // import SharedItem model
 // Get current user's profile
 const getme = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.getme(req.user.id);
@@ -185,6 +186,55 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     },
   });
 });
+// Get items of a user's category (for profile view)
+const getUserCategoryItems = catchAsync(async (req: Request, res: Response) => {
+  const { userId, categoryId } = req.params;
+
+  // check user exists
+  const user = await User.findById(userId);
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: 'User not found',
+      data: null,
+    });
+  }
+
+  // check category exists under that user
+  const category = await Category.findOne({
+    _id: categoryId,
+    createdBy: userId,
+  });
+  if (!category) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: 'Category not found for this user',
+      data: null,
+    });
+  }
+
+  // get shared items of that category
+  const items = await SharedItem.find({
+    sharedBy: userId,
+    category: categoryId,
+  }).select('title url type createdAt');
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Category items fetched successfully',
+    data: {
+      category: {
+        id: category._id,
+        name: category.categoryName,
+        images: category.categoryImages,
+      },
+      items,
+    },
+  });
+});
 
 // Get all users (used by admin)
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
@@ -272,6 +322,7 @@ export const userControllers = {
   getme,
   updateProfile,
   getProfile,
+  getUserCategoryItems,
   updatePersonalInfo,
   getPersonalInfo,
   getsingleUser,

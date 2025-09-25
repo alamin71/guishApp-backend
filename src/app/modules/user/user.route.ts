@@ -88,6 +88,11 @@ router.get(
   auth(USER_ROLE.vendor, USER_ROLE.admin),
   userControllers.getAllUsers,
 );
+router.get(
+  '/:userId/category/:categoryId/',
+  auth('user', 'admin'),
+  userControllers.getUserCategoryItems,
+);
 
 router.delete(
   '/',
