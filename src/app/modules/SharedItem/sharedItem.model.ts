@@ -4,7 +4,7 @@ const sharedItemSchema = new Schema(
   {
     title: { type: String, required: true },
     url: { type: String, required: true },
-    type: { type: String, enum: ['video', 'link', 'file'], default: 'link' },
+    type: { type: String, enum: ['video', 'link', 'file','website'], default: 'link' },
     sharedBy: { type: Types.ObjectId, ref: 'User', required: true },
     category: { type: Types.ObjectId, ref: 'Category', required: true },
   },

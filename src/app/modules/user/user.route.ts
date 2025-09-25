@@ -89,7 +89,7 @@ router.get(
   userControllers.getAllUsers,
 );
 router.get(
-  '/:userId/category/:categoryId/',
+  '/:userId/category/:categoryId',
   auth('user', 'admin'),
   userControllers.getUserCategoryItems,
 );
