@@ -153,12 +153,46 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
 
 
 //get profile information and categories names by id
+// const getProfile = catchAsync(async (req: Request, res: Response) => {
+//   const userId = req.params.id; // from URL get user ID 
+
+//   // find user
+//   const user = await User.findById(userId)
+//     .select('-password -__v -isDeleted -needsPasswordChange') 
+//     .lean();
+
+//   if (!user) {
+//     return sendResponse(res, {
+//       statusCode: 404,
+//       success: false,
+//       message: 'User not found',
+//       data: null,
+//     });
+//   }
+
+//   // user jodi kono category create kore thake tader nam ebong chobi niye asa
+//   const categories = await Category.find({ createdBy: user._id })
+//     .select('categoryName categoryImages -_id') 
+//     .lean();
+
+
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: 'User profile fetched successfully',
+//     data: {
+//       ...user,
+//       categories: categories, 
+//     },
+//   });
+// });
+// get profile information and categories names by id
 const getProfile = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.params.id; // from URL get user ID 
+  const userId = req.params.id;
 
   // find user
   const user = await User.findById(userId)
-    .select('-password -__v -isDeleted -needsPasswordChange') 
+    .select('-password -__v -isDeleted -needsPasswordChange')
     .lean();
 
   if (!user) {
@@ -170,11 +204,10 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  // user jodi kono category create kore thake tader nam ebong chobi niye asa
+  // user jodi kono category create kore thake tader nam, chobi, ebong id niye asa
   const categories = await Category.find({ createdBy: user._id })
-    .select('categoryName categoryImages -_id') 
+    .select('_id categoryName categoryImages') // এখানে `_id` রাখলাম
     .lean();
-
 
   sendResponse(res, {
     statusCode: 200,
@@ -182,10 +215,11 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
     message: 'User profile fetched successfully',
     data: {
       ...user,
-      categories: categories, 
+      categories,
     },
   });
 });
+
 // Get items of a user's category (for profile view)
 const getUserCategoryItems = catchAsync(async (req: Request, res: Response) => {
   const { userId, categoryId } = req.params;
