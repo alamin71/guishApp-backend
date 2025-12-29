@@ -6,7 +6,6 @@ const categorySchema = new Schema<ICategory, CategoryModel>(
     categoryName: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     categoryImages: [
@@ -17,13 +16,15 @@ const categorySchema = new Schema<ICategory, CategoryModel>(
     ],
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: 'User',  
+      ref: 'User',
       required: true,
     },
   },
-  
   { timestamps: true },
 );
+
+// ✅ প্রতি user এর মধ্যে categoryName unique হবে
+categorySchema.index({ createdBy: 1, categoryName: 1 }, { unique: true });
 
 const Category = model<ICategory, CategoryModel>('Category', categorySchema);
 
