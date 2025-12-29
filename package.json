@@ -6,7 +6,7 @@
   "scripts": {
     "start:prod": "node ./dist/server.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "lint": "eslint src --ignore-path .eslintignore",
+    "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "prettier": "prettier --ignore-path .prettierignore --write \"src/**/*.{js,ts,json}\"",
     "prettier:fix": "prettier --write src",

@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+dist
+.git
+.gitignore
+.env
+.env.production
+README.md
+readme.md
+.prettierrc.json
+.prettierignore
+.eslintignore
+eslint.config.mjs
+.lintstagedrc
+.husky
