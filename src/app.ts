@@ -23,7 +23,7 @@ app.use(
 // application routes
 app.use('/api/v1', router);
 app.get('/', (req: Request, res: Response) => {
-  res.send('GuishApp server is running');
+  res.send('GuishApp Server is Up and Running');
 });
 app.use(globalErrorHandler);
 
