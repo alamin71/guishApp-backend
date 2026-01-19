@@ -151,6 +151,7 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 });
 
 // -------------------- Google Login --------------------
+// -------------------- Google Login --------------------
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
   const { idToken } = req.body;
   if (!idToken) {
@@ -171,6 +172,7 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
     user = await User.create({
       email: payload.email,
       fullName: payload.name,
+      password: 'google-oauth-' + Math.random().toString(36).slice(2), // Random password
       isVerified: true,
     });
   }
