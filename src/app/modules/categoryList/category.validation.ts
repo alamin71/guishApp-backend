@@ -1,18 +1,3 @@
-// import { z } from 'zod';
-
-// // ✅ Create validation
-// export const createCategoryValidation = z.object({
-//   body: z.object({
-//     categoryName: z.string().min(1, 'Category name is required'),
-//   }),
-// });
-
-// // ✅ Update validation
-// export const updateCategoryValidation = z.object({
-//   body: z.object({
-//     categoryName: z.string().optional(),
-//   }),
-// });
 import { z } from 'zod';
 
 // ✅ Create validation

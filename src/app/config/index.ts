@@ -17,6 +17,7 @@ export default {
   socket_port: process.env.SOCKET_PORT,
   stripe_secret: process.env.STRIPE_SECRET,
   stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
+  google_client_id: process.env.GOOGLE_CLIENT_ID,
   openai_api_key: process.env.OPENAI_API_KEY,
   aws: {
     region: process.env.region,

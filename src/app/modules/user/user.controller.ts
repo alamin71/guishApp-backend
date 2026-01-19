@@ -139,7 +139,6 @@ const getPersonalInfo = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 // Get single user (used by admin)
 const getsingleUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.getSingleUser(req.params.id);
@@ -151,41 +150,6 @@ const getsingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
-//get profile information and categories names by id
-// const getProfile = catchAsync(async (req: Request, res: Response) => {
-//   const userId = req.params.id; // from URL get user ID 
-
-//   // find user
-//   const user = await User.findById(userId)
-//     .select('-password -__v -isDeleted -needsPasswordChange') 
-//     .lean();
-
-//   if (!user) {
-//     return sendResponse(res, {
-//       statusCode: 404,
-//       success: false,
-//       message: 'User not found',
-//       data: null,
-//     });
-//   }
-
-//   // user jodi kono category create kore thake tader nam ebong chobi niye asa
-//   const categories = await Category.find({ createdBy: user._id })
-//     .select('categoryName categoryImages -_id') 
-//     .lean();
-
-
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: 'User profile fetched successfully',
-//     data: {
-//       ...user,
-//       categories: categories, 
-//     },
-//   });
-// });
 // get profile information and categories names by id
 const getProfile = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id;

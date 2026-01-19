@@ -23,7 +23,6 @@ const categorySchema = new Schema<ICategory, CategoryModel>(
   { timestamps: true },
 );
 
-// ✅ প্রতি user এর মধ্যে categoryName unique হবে
 categorySchema.index({ createdBy: 1, categoryName: 1 }, { unique: true });
 
 const Category = model<ICategory, CategoryModel>('Category', categorySchema);
